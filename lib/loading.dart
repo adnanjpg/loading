@@ -5,30 +5,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 var loadingProvider = _provInit();
 
-_provInit() => StateProvider(
-      (ref) {
-        return false;
-      },
-    );
+StateProvider<bool>? _prov;
+
+StateProvider<bool> _provInit() {
+  _prov ??= StateProvider(
+    (ref) {
+      return false;
+    },
+  );
+
+  return _prov!;
+}
 
 /// how to use:
 /// wrap your body with `Loading`
 ///
 /// when you want to start or stop loading,
-/// call `Loading.load(context, bool start)`
+/// call `Loading.load(context:context, ref:ref, true/false)`
 class Loading extends StatelessWidget {
-  static disposeLoading(BuildContext context) {
-    loadingProvider = null;
+  static disposeLoading(WidgetRef ref) {
+    ref.read(loadingProvider.notifier).state = false;
   }
 
-  static init(BuildContext context) {
-    loadingProvider ??= _provInit();
-  }
-
-  static load(BuildContext context, [bool b = true]) {
+  static load({
+    required BuildContext context,
+    required WidgetRef ref,
+    required bool start,
+  }) {
     _unfocus(context);
     try {
-      context.read(loadingProvider).state = b;
+      ref.read(loadingProvider.notifier).state = start;
     } catch (e) {
       print(e);
     }
@@ -72,39 +78,31 @@ class Loading extends StatelessWidget {
   }
 }
 
-class _LoadingBuilder extends StatefulWidget {
+class _LoadingBuilder extends ConsumerStatefulWidget {
   const _LoadingBuilder({Key? key}) : super(key: key);
 
   @override
-  State<_LoadingBuilder> createState() => _LoadingBuilderState();
+  ConsumerState<_LoadingBuilder> createState() => _LoadingBuilderState();
 }
 
-class _LoadingBuilderState extends State<_LoadingBuilder> {
+class _LoadingBuilderState extends ConsumerState<_LoadingBuilder> {
   @override
   void deactivate() {
-    Loading.disposeLoading(context);
+    Loading.disposeLoading(ref);
     super.deactivate();
   }
 
   @override
   void didUpdateWidget(covariant _LoadingBuilder oldWidget) {
-    Loading.disposeLoading(context);
+    Loading.disposeLoading(ref);
     super.didUpdateWidget(oldWidget);
   }
 
   @override
-  void initState() {
-    Loading.init(context);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Loading.init(context);
-
     return Consumer(
-      builder: (context, watch, child) {
-        final isLoading = watch(loadingProvider).state;
+      builder: (context, ref, child) {
+        final isLoading = ref.watch(loadingProvider);
 
         if (!isLoading) {
           return Container();
@@ -128,17 +126,19 @@ class _LoadingBuilderState extends State<_LoadingBuilder> {
   }
 }
 
-class IsLoadingBuilder extends StatelessWidget {
-  final Widget Function(BuildContext context, bool isLoading) builder;
+class IsLoadingBuilder extends ConsumerWidget {
+  final Widget Function(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoading,
+  ) builder;
+
   const IsLoadingBuilder({required this.builder, Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, watch, child) {
-        final isLoading = watch(loadingProvider).state;
-        return builder(context, isLoading);
-      },
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = ref.watch(loadingProvider);
+
+    return builder(context, ref, isLoading);
   }
 }

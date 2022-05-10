@@ -23,10 +23,10 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: IsLoadingBuilder(
-          builder: (context, isLoading) {
+          builder: (context, ref, isLoading) {
             return ElevatedButton(
               onPressed: () {
-                Loading.load(context, !isLoading);
+                Loading.load(context: context, ref: ref, start: !isLoading);
               },
               child: Text(isLoading ? 'Loading' : 'Load'),
             );
