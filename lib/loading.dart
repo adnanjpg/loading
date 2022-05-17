@@ -24,7 +24,11 @@ StateProvider<bool> _provInit() {
 /// call `Loading.load(context:context, ref:ref, true/false)`
 class Loading extends StatelessWidget {
   static disposeLoading(WidgetRef ref) {
-    ref.read(loadingProvider.notifier).state = false;
+    try {
+      ref.read(loadingProvider.notifier).state = false;
+    } catch (e) {
+      debugPrint('[LOADING LIBRARY] ' + e.toString());
+    }
   }
 
   static load({
@@ -36,7 +40,7 @@ class Loading extends StatelessWidget {
     try {
       ref.read(loadingProvider.notifier).state = start;
     } catch (e) {
-      print(e);
+      debugPrint('[LOADING LIBRARY] ' + e.toString());
     }
   }
 
@@ -44,7 +48,7 @@ class Loading extends StatelessWidget {
     try {
       FocusScope.of(context).unfocus();
     } catch (e) {
-      print(e);
+      debugPrint('[LOADING LIBRARY] ' + e.toString());
     }
   }
 
