@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:loading/loading.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -23,19 +22,23 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: IsLoadingBuilder(
-          builder: (context, ref, isLoading) {
+          builder: (context, isLoading, _) {
             return ElevatedButton(
               onPressed: () {
-                Loading.load(context: context, ref: ref, start: !isLoading);
+                if (isLoading) {
+                  Loading.unload(context);
+                } else {
+                  Loading.load(context);
+                }
               },
-              child: Text(isLoading ? 'Loading' : 'Load'),
+              child: Text(isLoading ? 'Unload' : 'Load'),
             );
           },
         ),
       ),
       body: const Loading(
         child: Center(
-          child: Text('aha'),
+          child: Text('wow cool package dude 😳'),
         ),
       ),
     );
