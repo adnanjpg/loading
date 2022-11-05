@@ -13,14 +13,14 @@ final _loadingNotifier = ValueNotifier(false);
 /// when you want to stop loading:
 /// call `Loading.unload(context:context)`
 class Loading extends StatelessWidget {
-  static load(BuildContext context) {
+  static load([BuildContext? context]) {
     return _load(
       context: context,
       start: true,
     );
   }
 
-  static unload(BuildContext context) {
+  static unload([BuildContext? context]) {
     return _load(
       context: context,
       start: false,
@@ -28,7 +28,7 @@ class Loading extends StatelessWidget {
   }
 
   static _load({
-    required BuildContext context,
+    BuildContext? context,
     required bool start,
   }) {
     _unfocus(context);
@@ -39,7 +39,9 @@ class Loading extends StatelessWidget {
     }
   }
 
-  static _unfocus(BuildContext context) {
+  static _unfocus([BuildContext? context]) {
+    if (context == null) return;
+
     try {
       FocusScope.of(context).unfocus();
     } catch (e) {
